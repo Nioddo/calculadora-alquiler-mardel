@@ -36,7 +36,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
-main{max-width:920px;margin:0 auto;padding:28px 18px 64px}
+main{max-width:1240px;margin:0 auto;padding:28px 18px 64px}
 h1,h2{font-family:"Bricolage Grotesque","Figtree",system-ui,sans-serif;line-height:1.1;margin:0}
 h1{font-size:clamp(2rem,6vw,3rem);font-weight:700;letter-spacing:-.02em}
 h2{font-size:1.45rem;font-weight:700;letter-spacing:-.01em}
@@ -191,6 +191,27 @@ td.name .sw{margin-right:8px;vertical-align:-1px}
 .bar-val{font-weight:600;text-align:right}
 .bar-key{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:6px}
 .bar-key .sw{margin-right:6px;vertical-align:-1px}
+@media (min-width:900px){
+  body{font-size:17px}
+  main{padding:44px 40px 96px}
+  section{margin-top:56px}
+  h2{font-size:1.7rem}
+  .sec-head p{font-size:1rem;max-width:80ch}
+  .lead{font-size:1.1rem;max-width:80ch}
+  .panel{padding:22px;border-radius:16px}
+  .who input{width:140px}
+  .night{width:46px;height:50px}
+  table.nights{border-spacing:6px}
+  .settings{gap:18px 28px}
+  input[type=number]{width:150px}
+  .item{padding:16px}
+  .charts{grid-template-columns:1fr 1fr;gap:20px}
+  .pie-wrap svg{width:210px;height:210px}
+  .me-grid{grid-template-columns:repeat(3,1fr);gap:20px}
+  .me-hero{padding:32px}
+  #tour-pop{width:min(560px,calc(100vw - 48px));left:auto;right:32px;transform:none;max-height:60vh}
+  #tour-pop.center{left:50%;right:auto;top:50%;transform:translate(-50%,-50%)}
+}
 @media (max-width:560px){
   main{padding:20px 12px 56px}
   .who input{width:78px}

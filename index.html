@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuentas del alquiler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF2F0; --surface:#FFFFFF; --ink:#13313A; --muted:#55717A; --line:#C9DAD8;
+  --sun:#F2B134; --sun-ink:#3A2A00; --sea:#2A7A82; --sea-soft:#D6EAEA;
+  --owe:#B23A48; --get:#1F7A55; --field:#F6FAF9;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E2127; --surface:#15313A; --ink:#E4EFED; --muted:#93AFB4; --line:#2A4D56;
+    --sun:#F2B134; --sun-ink:#2A1E00; --sea:#5FB6BD; --sea-soft:#1D3F48;
+    --owe:#F07A86; --get:#6FD3A3; --field:#102A31;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E2127; --surface:#15313A; --ink:#E4EFED; --muted:#93AFB4; --line:#2A4D56;
+  --sun:#F2B134; --sun-ink:#2A1E00; --sea:#5FB6BD; --sea-soft:#1D3F48;
+  --owe:#F07A86; --get:#6FD3A3; --field:#102A31;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+main{max-width:920px;margin:0 auto;padding:28px 18px 64px}
+h1,h2{font-family:"Bricolage Grotesque","Figtree",system-ui,sans-serif;line-height:1.1;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:.5rem 0 0;max-width:62ch}
+section{margin-top:40px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.sec-head p{margin:.25rem 0 0;color:var(--muted);font-size:.95rem;max-width:60ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* Noches */
+table.nights{border-collapse:separate;border-spacing:4px;min-width:100%}
+table.nights th,table.nights td{padding:0;text-align:center;white-space:nowrap}
+table.nights thead th{font-weight:500;font-size:.78rem;color:var(--muted);line-height:1.15;padding-bottom:2px}
+table.nights thead th b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem;color:var(--ink);font-weight:700}
+.who{position:sticky;left:0;background:var(--surface);z-index:1;text-align:left!important;padding-right:6px!important}
+.who input{width:96px;font-weight:600}
+.night{width:34px;height:40px;border-radius:9px;border:1.5px dashed var(--line);background:transparent;cursor:pointer;padding:0;display:block}
+.night.on{background:var(--sun);border:1.5px solid var(--sun);box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
+.night:hover{border-color:var(--sea)}
+.cnt{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.1rem;padding:0 6px!important;min-width:44px}
+.cnt small{font-family:"Figtree",sans-serif;font-weight:400;font-size:.75rem;color:var(--muted)}
+.amt{text-align:right!important;padding:0 6px!important;font-weight:600;min-width:96px}
+tfoot td{font-size:.8rem;color:var(--muted)}
+tfoot .who{font-size:.8rem;color:var(--muted)}
+
+/* Campos */
+input,select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-height:38px;max-width:100%}
+input[type=number]{width:120px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2.5px solid var(--sea);outline-offset:2px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+label.f input,label.f select{color:var(--ink);font-size:1rem}
+.settings{display:flex;flex-wrap:wrap;gap:14px 20px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--sea);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:600;min-height:40px}
+:root[data-theme="dark"] .btn{color:#0E2127}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#0E2127}}
+.btn.ghost,:root[data-theme="dark"] .btn.ghost{background:transparent;color:var(--sea);border:1.5px solid var(--sea)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.ghost{color:var(--sea)}}
+.del{background:transparent;border:0;color:var(--muted);text-decoration:underline;padding:6px;font-size:.85rem}
+.del.armed{color:var(--owe);font-weight:600}
+.row-add{margin-top:12px}
+
+/* Listas de pagos y gastos */
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.item .eq{font-size:.9rem;color:var(--muted);padding-bottom:9px;min-width:110px}
+.item .grow{flex:1 1 160px}
+.item .grow input{width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%}
+.chips span{font-size:.85rem;color:var(--muted);align-self:center;margin-right:4px}
+.chip{border:1.5px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 12px;font-size:.88rem;min-height:32px}
+.chip.on{background:var(--sea-soft);border-color:var(--sea);color:var(--ink);font-weight:600}
+.empty{color:var(--muted);padding:14px;border:1.5px dashed var(--line);border-radius:12px;margin:0}
+.totals{margin-top:12px;color:var(--muted);font-size:.95rem}
+.totals b{color:var(--ink)}
+.warn{color:var(--owe);font-weight:600}
+
+/* Resultados */
+table.res{border-collapse:collapse;width:100%;min-width:620px}
+table.res th,table.res td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+table.res th:first-child,table.res td:first-child{text-align:left}
+table.res thead th{font-size:.85rem;color:var(--muted);font-weight:500}
+table.res td small{display:block;color:var(--muted);font-size:.8rem}
+table.res td.name{font-weight:600}
+.pos{color:var(--get)} .neg{color:var(--owe)}
+.transfers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.transfers li{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--sun);border-radius:12px;padding:12px 14px}
+.transfers .t-who{font-size:1.02rem}
+.transfers .t-who b{font-weight:600}
+.transfers .t-amt{text-align:right;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.2rem}
+.transfers .t-amt small{display:block;font-family:"Figtree",sans-serif;font-weight:500;font-size:.85rem;color:var(--muted)}
+.sub{margin:22px 0 10px;font-size:1.1rem}
+textarea{width:100%;min-height:200px;font:inherit;font-size:.9rem;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px}
+.foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.note{font-size:.88rem;color:var(--muted)}
+/* Tutorial */
+header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.help{flex:none;margin-top:6px}
+#tour-block{position:fixed;inset:0;z-index:90}
+#tour-hl{position:fixed;z-index:91;border-radius:14px;pointer-events:none;box-shadow:0 0 0 3px var(--sun),0 0 0 100vmax rgba(10,25,30,.62);transition:left .25s,top .25s,width .25s,height .25s}
+#tour-pop{position:fixed;z-index:92;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));width:min(520px,calc(100vw - 24px));max-height:46vh;overflow-y:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#tour-pop.center{top:50%;bottom:auto;transform:translate(-50%,-50%)}
+.tuto-step{margin:0 0 6px;font-size:.85rem;color:var(--muted)}
+.tuto-dots{display:flex;gap:4px;margin-bottom:12px}
+.tuto-dots i{height:5px;flex:1;border-radius:3px;background:var(--line)}
+.tuto-dots i.on{background:var(--sea)}
+#tuto-title{font-size:1.3rem;margin-bottom:8px}
+#tuto-body p{margin:0 0 8px}
+#tuto-body ul{margin:0 0 8px;padding-left:20px}
+#tuto-body li{margin-bottom:5px}
+.demo{display:inline-block;width:20px;height:24px;border-radius:6px;border:1.5px dashed var(--line);vertical-align:middle;margin:0 2px}
+.demo.on{background:var(--sun);border:1.5px solid var(--sun)}
+.tuto-nav{display:flex;align-items:center;gap:8px;margin-top:12px}
+.tuto-nav .spacer{flex:1}
+.tuto-nav button[disabled]{opacity:.4;cursor:default}
+/* Vistas */
+.views{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:8px;overflow-x:auto;padding:10px 0;margin-top:18px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.views::-webkit-scrollbar{display:none}
+.vtab{flex:none;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);color:var(--ink);text-decoration:none;font-weight:500;min-height:38px;background:var(--surface)}
+.vtab:hover{border-color:var(--sea)}
+.vtab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.person-only{display:none}
+body[data-view="person"] .person-only{display:block}
+body[data-view="person"] .general-only{display:none}
+.me-hero{padding:22px}
+.me-name{display:flex;align-items:center;gap:8px;font-weight:600;margin:0;color:var(--muted)}
+.me-label{margin:16px 0 0;font-weight:600;font-size:1.05rem}
+.me-big{font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(2.6rem,10vw,4rem);font-weight:700;line-height:1;margin:4px 0 6px;letter-spacing:-.02em}
+.me-eq{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.me-eq li{display:grid;grid-template-columns:18px auto 1fr;gap:8px;align-items:baseline}
+.me-eq .op{font-weight:700;color:var(--muted);text-align:center}
+.me-eq .v{font-weight:600;white-space:nowrap}
+.me-eq .d{color:var(--muted)}
+.me-eq-title{margin:0 0 2px;font-size:.85rem;color:var(--muted)}
+.me-big.ok{color:var(--get)}
+.me-sub{margin:0 0 16px;color:var(--muted)}
+.me-hero .bar{height:14px}
+.me-progress{font-size:.85rem;color:var(--muted);margin:6px 0 0}
+.me-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.me-grid h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.1rem;margin:0 0 8px}
+.lines{list-style:none;margin:0;padding:0}
+.lines li{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.lines li:last-child{border-bottom:0}
+.lines li b{text-align:right;white-space:nowrap;font-weight:600}
+.lines small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+.lines li.strong{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}
+.lines li.in b{color:var(--get)}
+.lines li.out b{color:var(--owe)}
+.night-chips{display:flex;flex-wrap:wrap;gap:6px}
+.night-chips span{background:var(--sun);color:var(--sun-ink);border-radius:8px;padding:4px 10px;font-weight:600;font-size:.88rem}
+/* Gráficos */
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px}
+figure.chart{margin:0}
+figure.chart figcaption{font-weight:600;margin-bottom:12px}
+.pie-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.pie-wrap svg{width:170px;height:170px;flex:none}
+.pie-big{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:21px;fill:var(--ink)}
+.pie-small{font-size:12px;fill:var(--muted)}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px;font-size:.92rem}
+.legend li{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center}
+.legend li b{font-weight:600;text-align:right}
+.legend li small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-block;flex:none}
+td.name .sw{margin-right:8px;vertical-align:-1px}
+.bar-row{display:grid;grid-template-columns:62px 1fr 92px;gap:10px;align-items:center;margin-bottom:10px;font-size:.92rem}
+.bar-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{display:flex;height:22px;border-radius:6px;background:var(--field);border:1px solid var(--line);overflow:hidden}
+.seg{flex:none;height:100%}
+.seg.paid{background:var(--sea)}
+.seg.pend{background:var(--sun)}
+.bar-val{font-weight:600;text-align:right}
+.bar-key{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:6px}
+.bar-key .sw{margin-right:6px;vertical-align:-1px}
+@media (max-width:560px){
+  main{padding:20px 12px 56px}
+  .who input{width:78px}
+  .night{width:30px;height:38px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <h1>Cuentas del alquiler</h1>
+      <p class="lead" id="range"></p>
+    </div>
+    <button class="btn ghost help" data-act="tutorial">Tutorial</button>
+  </header>
+  <nav class="views" id="views" aria-label="Elegí la vista"></nav>
+  <section class="person-only" id="me" aria-live="polite"></section>
+
+  <section class="general-only" id="sec-noches" aria-labelledby="h-noches">
+    <div class="sec-head">
+      <div>
+        <h2 id="h-noches">Las noches de cada uno</h2>
+        <p>Tocá cada noche para marcar o desmarcar quién duerme. El alquiler se reparte por noche dormida.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="scroll"><table class="nights" id="grid"></table></div>
+      <div class="row-add"><button class="btn ghost" data-act="addperson">Agregar persona</button></div>
+    </div>
+  </section>
+
+  <section class="general-only" id="sec-casa" aria-labelledby="h-casa">
+    <div class="sec-head"><div><h2 id="h-casa">La casa</h2></div></div>
+    <div class="panel settings">
+      <label class="f">Alquiler total (USD)<input type="number" min="0" step="any" data-act="set" data-k="total" id="s-total"></label>
+      <label class="f">Primera noche<input type="date" data-act="set" data-k="start" id="s-start"></label>
+      <label class="f">Cantidad de noches<input type="number" min="1" max="60" step="1" data-act="set" data-k="nights" id="s-nights"></label>
+      <label class="f">Cotización de hoy (pesos por dólar)<input type="number" min="0" step="any" data-act="set" data-k="rateNow" id="s-rate"></label>
+    </div>
+  </section>
+
+  <section class="general-only" id="sec-pagos" aria-labelledby="h-pagos">
+    <div class="sec-head">
+      <div>
+        <h2 id="h-pagos">Pagos del alquiler</h2>
+        <p>Lo que cada uno ya le pagó al dueño. Si pagaron en pesos, va la cotización a la que se pagó. Si alguien puso plata por otro, cargalo aparte a nombre de esa persona: queda debiéndosela.</p>
+      </div>
+    </div>
+    <div class="items" id="payments"></div>
+    <div class="row-add"><button class="btn ghost" data-act="addpay">Agregar pago</button></div>
+    <p class="totals" id="pay-totals"></p>
+  </section>
+
+  <section class="general-only" id="sec-extras" aria-labelledby="h-extras">
+    <div class="sec-head">
+      <div>
+        <h2 id="h-extras">Gastos extra</h2>
+        <p>Limpieza, sábanas, lo que sea. Elegí entre quiénes se reparte y si va igual para todos o por noches.</p>
+      </div>
+    </div>
+    <div class="items" id="extras"></div>
+    <div class="row-add"><button class="btn ghost" data-act="addextra">Agregar gasto</button></div>
+  </section>
+
+  <section class="general-only" aria-labelledby="h-res">
+    <div class="sec-head">
+      <div>
+        <h2 id="h-res">Cómo queda cada uno</h2>
+        <p>“Saldo” es la diferencia entre lo que puso y lo que le tocaba de lo ya pagado. “Falta pagar” es su parte de lo que todavía no se pagó, en pesos al cambio de hoy.</p>
+      </div>
+    </div>
+    <div class="charts" id="charts">
+      <figure class="panel chart">
+        <figcaption>Cuánto pone cada uno del total</figcaption>
+        <div id="pie"></div>
+      </figure>
+      <figure class="panel chart">
+        <figcaption>Lo ya pagado y lo que falta de cada uno</figcaption>
+        <div id="bars"></div>
+      </figure>
+    </div>
+    <div class="panel scroll" id="res-panel"><table class="res" id="res"></table></div>
+
+    <h3 class="sub" id="h-tr">Para quedar a mano con lo ya pagado</h3>
+    <ul class="transfers" id="transfers" aria-labelledby="h-tr"></ul>
+
+    <h3 class="sub">Resumen para mandar al grupo</h3>
+    <textarea id="summary" readonly aria-label="Resumen en texto"></textarea>
+    <div class="foot">
+      <button class="btn" data-act="copy" id="copy-btn">Copiar resumen</button>
+      <button class="del" data-act="reset" id="reset-btn">Volver a los datos iniciales</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var KEY = 'cuentas-alquiler-v2';
+  var SENA_RATE = 1493.3333;
+  var uid = function(){ return Math.random().toString(36).slice(2,9); };
+
+  function fill(n, from, to){ var a=[]; for(var i=0;i<n;i++) a.push(i>=from && i<to); return a; }
+
+  function defaults(){
+    var p = [
+      {id:'nico',  name:'Nico',   nights:fill(10,0,10)},
+      {id:'luca',  name:'Luca',   nights:fill(10,0,10)},
+      {id:'valen', name:'Valen',  nights:fill(10,0,10)},
+      {id:'lucho', name:'Lucho',  nights:fill(10,0,10)},
+      {id:'julian',name:'Julián', nights:fill(10,2,10)},
+      {id:'santi', name:'Santi',  nights:fill(10,0,3)}
+    ];
+    return {
+      total:1500, start:'2027-01-18', nights:10, rateNow:SENA_RATE,
+      people:p,
+      payments:[
+        {id:uid(), who:'nico',   para:'',      amount:134400, cur:'ARS', rate:SENA_RATE, note:'Seña'},
+        {id:uid(), who:'nico',   para:'valen', amount:44800,  cur:'ARS', rate:SENA_RATE, note:'Seña de Valen'},
+        {id:uid(), who:'luca',   para:'',      amount:134400, cur:'ARS', rate:SENA_RATE, note:'Seña'},
+        {id:uid(), who:'luca',   para:'valen', amount:44800,  cur:'ARS', rate:SENA_RATE, note:'Seña de Valen'},
+        {id:uid(), who:'lucho',  para:'',      amount:134400, cur:'ARS', rate:SENA_RATE, note:'Seña'},
+        {id:uid(), who:'lucho',  para:'valen', amount:44800,  cur:'ARS', rate:SENA_RATE, note:'Seña de Valen'},
+        {id:uid(), who:'julian', para:'',      amount:134400, cur:'ARS', rate:SENA_RATE, note:'Seña'}
+      ],
+      extras:[]
+    };
+  }
+
+  var S;
+  try { var raw = localStorage.getItem(KEY); S = raw ? JSON.parse(raw) : null; } catch(e){ S = null; }
+  if(!S || !Array.isArray(S.people)) S = defaults();
+
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+  var nf2 = new Intl.NumberFormat('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var nf0 = new Intl.NumberFormat('es-AR',{maximumFractionDigits:0});
+  function usd(n){ return 'US$ ' + nf2.format(Math.abs(n) < 0.005 ? 0 : n); }
+  function ars(n){ return '$ ' + nf0.format(Math.round(n)); }
+  function num(v){ var x = parseFloat(String(v).replace(',','.')); return isFinite(x) ? x : 0; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toUSD(amount, cur, rate){ return cur === 'USD' ? num(amount) : (num(rate) > 0 ? num(amount)/num(rate) : 0); }
+  function person(id){ for(var i=0;i<S.people.length;i++) if(S.people[i].id===id) return S.people[i]; return null; }
+  function nameOf(id){ var p = person(id); return p ? (p.name || 'Sin nombre') : 'Sin nombre'; }
+
+  function dayDate(i){ var d = new Date(S.start + 'T12:00:00'); if(isNaN(d)) d = new Date('2027-01-18T12:00:00'); d.setDate(d.getDate()+i); return d; }
+
+  function normalize(){
+    var n = Math.max(1, Math.min(60, Math.round(num(S.nights)) || 1));
+    S.nights = n;
+    S.people.forEach(function(p){
+      if(!Array.isArray(p.nights)) p.nights = [];
+      if(p.nights.length > n) p.nights = p.nights.slice(0,n);
+      while(p.nights.length < n) p.nights.push(false);
+    });
+  }
+
+  /* ---------- Cálculo ---------- */
+  function compute(){
+    var R = num(S.total), rate = num(S.rateNow);
+    var res = S.people.map(function(p){
+      return {id:p.id, name:p.name || 'Sin nombre', n:p.nights.filter(Boolean).length, total:0, put:0, borrowed:0, pocket:0, items:[], paidShare:0, pend:0};
+    });
+    var byId = {}; res.forEach(function(r){ byId[r.id] = r; });
+    var N = res.reduce(function(a,r){ return a + r.n; }, 0);
+
+    var P = 0, loans = [];
+    S.payments.forEach(function(pay){
+      var v = toUSD(pay.amount, pay.cur, pay.rate);
+      P += v;
+      var ben = (pay.para && byId[pay.para]) ? pay.para : pay.who;
+      if(byId[ben]) byId[ben].put += v;
+      if(byId[pay.who]) byId[pay.who].pocket += v;
+      if(ben !== pay.who && byId[pay.who] && v > 0){
+        byId[ben].borrowed += v;
+        loans.push({from:ben, to:pay.who, amt:v});
+      }
+    });
+
+    res.forEach(function(r){
+      var w = N ? r.n / N : 0;
+      r.rent = R * w;
+      r.total += R * w;
+      r.paidShare += P * w;
+      r.pend += (R - P) * w;
+    });
+
+    var extraWarn = [];
+    S.extras.forEach(function(e){
+      var A = toUSD(e.amount, e.cur, e.rate);
+      if(!A) return;
+      var parts = (e.parts || []).filter(function(id){ return byId[id]; });
+      var weights = parts.map(function(id){ return e.mode === 'nights' ? byId[id].n : 1; });
+      var W = weights.reduce(function(a,b){ return a+b; }, 0);
+      if(!W){ extraWarn.push(e.name || 'Gasto sin nombre'); return; }
+      var paid = !!byId[e.payer];
+      if(paid){ byId[e.payer].put += A; byId[e.payer].pocket += A; }
+      parts.forEach(function(id, k){
+        var sh = A * weights[k] / W;
+        byId[id].total += sh;
+        if(paid) byId[id].paidShare += sh; else byId[id].pend += sh;
+        byId[id].items.push({name:e.name || 'Gasto extra', amt:sh,
+          how:(e.mode === 'nights' ? 'por noches' : 'igual entre ' + parts.length),
+          payer:paid ? byId[e.payer].name : ''});
+      });
+    });
+
+    res.forEach(function(r){ r.bal = r.put - r.paidShare; });
+
+    var pairs = {};
+    function add(f, t, a){
+      var k = f + '>' + t, rk = t + '>' + f;
+      if(pairs[rk]){ var rest = pairs[rk] - a; if(rest >= 0) pairs[rk] = rest; else { delete pairs[rk]; pairs[k] = (pairs[k] || 0) - rest; } }
+      else pairs[k] = (pairs[k] || 0) + a;
+    }
+    loans.forEach(function(l){ add(l.from, l.to, l.amt); });
+    var deb = res.filter(function(r){ return r.bal < -0.005; }).map(function(r){ return {id:r.id, amt:-r.bal}; }).sort(function(a,b){ return b.amt-a.amt; });
+    var cre = res.filter(function(r){ return r.bal >  0.005; }).map(function(r){ return {id:r.id, amt: r.bal}; }).sort(function(a,b){ return b.amt-a.amt; });
+    var i = 0, j = 0;
+    while(i < deb.length && j < cre.length){
+      var x = Math.min(deb[i].amt, cre[j].amt);
+      add(deb[i].id, cre[j].id, x);
+      deb[i].amt -= x; cre[j].amt -= x;
+      if(deb[i].amt < 0.005) i++;
+      if(cre[j].amt < 0.005) j++;
+    }
+    var order = {}; S.people.forEach(function(p, k){ order[p.id] = k; });
+    var tr = Object.keys(pairs).filter(function(k){ return pairs[k] > 0.005; }).map(function(k){
+      var s = k.split('>'); return {f:s[0], t:s[1], from:byId[s[0]].name, to:byId[s[1]].name, amt:pairs[k]};
+    }).sort(function(a,b){ return (order[a.f] - order[b.f]) || (order[a.t] - order[b.t]); });
+    return {res:res, N:N, P:P, R:R, rate:rate, tr:tr, extraWarn:extraWarn};
+  }
+
+  /* ---------- Render ---------- */
+  function renderHeader(){
+    var a = dayDate(0), b = dayDate(S.nights);
+    var o = {weekday:'long', day:'numeric', month:'long'};
+    document.getElementById('range').textContent =
+      'Llegada el ' + a.toLocaleDateString('es-AR', o).replace(',', '') + ', salida el ' + b.toLocaleDateString('es-AR', o).replace(',', '') +
+      '. ' + S.nights + ' noches en total.';
+    document.getElementById('s-total').value = S.total;
+    document.getElementById('s-start').value = S.start;
+    document.getElementById('s-nights').value = S.nights;
+    document.getElementById('s-rate').value = S.rateNow;
+  }
+
+  function renderGrid(){
+    var h = '<thead><tr><th class="who" scope="col">Quién</th>';
+    for(var i=0;i<S.nights;i++){
+      var d = dayDate(i);
+      h += '<th scope="col">' + esc(d.toLocaleDateString('es-AR',{weekday:'short'}).replace('.','')) + '<b>' + d.getDate() + '</b></th>';
+    }
+    h += '<th scope="col">Noches</th><th scope="col">Le toca</th><th><span class="sr" style="position:absolute;left:-9999px">Quitar</span></th></tr></thead><tbody>';
+    S.people.forEach(function(p){
+      h += '<tr><th class="who" scope="row"><input aria-label="Nombre" data-act="name" data-id="' + p.id + '" value="' + esc(p.name) + '"></th>';
+      p.nights.forEach(function(on, i){
+        var d = dayDate(i);
+        h += '<td><button class="night' + (on?' on':'') + '" aria-pressed="' + on + '" data-act="night" data-id="' + p.id + '" data-i="' + i + '" aria-label="' + esc(p.name) + ', noche del ' + d.getDate() + '"></button></td>';
+      });
+      h += '<td class="cnt" data-cnt="' + p.id + '"></td><td class="amt" data-amt="' + p.id + '"></td>';
+      h += '<td><button class="del" data-act="delperson" data-id="' + p.id + '">Quitar</button></td></tr>';
+    });
+    h += '</tbody><tfoot><tr><td class="who">Duermen</td>';
+    for(var k=0;k<S.nights;k++) h += '<td data-col="' + k + '"></td>';
+    h += '<td></td><td></td><td></td></tr></tfoot>';
+    document.getElementById('grid').innerHTML = h;
+  }
+
+  function peopleOptions(sel, withNone){
+    var o = withNone ? '<option value=""' + (sel ? '' : ' selected') + '>Nadie todavía</option>' : '';
+    S.people.forEach(function(p){ o += '<option value="' + p.id + '"' + (p.id===sel?' selected':'') + '>' + esc(p.name || 'Sin nombre') + '</option>'; });
+    return o;
+  }
+  function curSelect(kind, id, cur){
+    return '<label class="f">Moneda<select data-act="' + kind + '" data-id="' + id + '" data-k="cur">' +
+      '<option value="ARS"' + (cur==='ARS'?' selected':'') + '>Pesos</option>' +
+      '<option value="USD"' + (cur==='USD'?' selected':'') + '>Dólares</option></select></label>';
+  }
+  function rateField(kind, id, item){
+    if(item.cur !== 'ARS') return '';
+    return '<label class="f">Cotización<input type="number" min="0" step="any" data-act="' + kind + '" data-id="' + id + '" data-k="rate" value="' + item.rate + '"></label>';
+  }
+
+  function renderPayments(){
+    var box = document.getElementById('payments');
+    if(!S.payments.length){ box.innerHTML = '<p class="empty">Todavía no hay pagos cargados. Agregá la seña o lo que ya se haya pagado.</p>'; return; }
+    box.innerHTML = S.payments.map(function(p){
+      return '<div class="item">' +
+        '<label class="f">Quién pagó<select data-act="pay" data-id="' + p.id + '" data-k="who">' + peopleOptions(p.who, false) + '</select></label>' +
+        '<label class="f">A nombre de<select data-act="pay" data-id="' + p.id + '" data-k="para"><option value="">Él mismo</option>' + peopleOptions(p.para, false) + '</select></label>' +
+        '<label class="f">Monto<input type="number" min="0" step="any" data-act="pay" data-id="' + p.id + '" data-k="amount" value="' + p.amount + '"></label>' +
+        curSelect('pay', p.id, p.cur) + rateField('pay', p.id, p) +
+        '<label class="f grow">Detalle<input data-act="pay" data-id="' + p.id + '" data-k="note" value="' + esc(p.note || '') + '"></label>' +
+        '<span class="eq" data-eq="' + p.id + '"></span>' +
+        '<button class="del" data-act="delpay" data-id="' + p.id + '">Quitar</button></div>';
+    }).join('');
+  }
+
+  function renderExtras(){
+    var box = document.getElementById('extras');
+    if(!S.extras.length){ box.innerHTML = '<p class="empty">Todavía no hay gastos extra. Agregá uno cuando aparezca la limpieza, las sábanas o lo que sea.</p>'; return; }
+    box.innerHTML = S.extras.map(function(e){
+      var chips = S.people.map(function(p){
+        var on = (e.parts || []).indexOf(p.id) >= 0;
+        return '<button class="chip' + (on?' on':'') + '" aria-pressed="' + on + '" data-act="part" data-id="' + e.id + '" data-p="' + p.id + '">' + esc(p.name || 'Sin nombre') + '</button>';
+      }).join('');
+      return '<div class="item">' +
+        '<label class="f grow">Gasto<input data-act="ext" data-id="' + e.id + '" data-k="name" value="' + esc(e.name || '') + '" placeholder="Limpieza, sábanas..."></label>' +
+        '<label class="f">Monto<input type="number" min="0" step="any" data-act="ext" data-id="' + e.id + '" data-k="amount" value="' + e.amount + '"></label>' +
+        curSelect('ext', e.id, e.cur) + rateField('ext', e.id, e) +
+        '<label class="f">Lo pagó<select data-act="ext" data-id="' + e.id + '" data-k="payer">' + peopleOptions(e.payer, true) + '</select></label>' +
+        '<label class="f">Se reparte<select data-act="ext" data-id="' + e.id + '" data-k="mode">' +
+          '<option value="equal"' + (e.mode!=='nights'?' selected':'') + '>Igual entre ellos</option>' +
+          '<option value="nights"' + (e.mode==='nights'?' selected':'') + '>Por noches</option></select></label>' +
+        '<span class="eq" data-eq="' + e.id + '"></span>' +
+        '<button class="del" data-act="delextra" data-id="' + e.id + '">Quitar</button>' +
+        '<div class="chips"><span>Entre:</span>' + chips + '</div></div>';
+    }).join('');
+  }
+
+  var COLORS = ['#F2B134','#2A7A82','#C2566A','#3D5A98','#4F9D69','#8A63B8','#C9A27E','#6B8A93'];
+  function colorOf(k){ return COLORS[k % COLORS.length]; }
+  var pct = new Intl.NumberFormat('es-AR',{maximumFractionDigits:1});
+
+  function renderCharts(c){
+    var pie = document.getElementById('pie'), bars = document.getElementById('bars');
+    var tot = c.res.reduce(function(a,r){ return a + r.total; }, 0);
+    if(tot < 0.005){
+      pie.innerHTML = bars.innerHTML = '<p class="note">Marcá noches para ver el reparto.</p>';
+      return;
+    }
+    var R = 70, C = 2 * Math.PI * R, acc = 0, segs = '';
+    var active = c.res.filter(function(r){ return r.total > 0.005; }).length;
+    var gap = active > 1 ? 1.5 : 0;
+    c.res.forEach(function(r, k){
+      if(r.total < 0.005) return;
+      var len = r.total / tot * C;
+      var draw = Math.max(0.1, len - gap);
+      segs += '<circle r="' + R + '" cx="100" cy="100" fill="none" stroke="' + colorOf(k) + '" stroke-width="34"' +
+        ' stroke-dasharray="' + draw + ' ' + (C - draw) + '" stroke-dashoffset="' + (-acc) + '" transform="rotate(-90 100 100)">' +
+        '<title>' + esc(r.name) + ': ' + usd(r.total) + '</title></circle>';
+      acc += len;
+    });
+    var svg = '<svg viewBox="0 0 200 200" role="img" aria-label="Reparto del total por persona">' + segs +
+      '<text x="100" y="99" text-anchor="middle" class="pie-big">US$ ' + nf0.format(tot) + '</text>' +
+      '<text x="100" y="118" text-anchor="middle" class="pie-small">total</text></svg>';
+    var leg = '<ul class="legend">' + c.res.map(function(r, k){
+      return '<li><i class="sw" style="background:' + colorOf(k) + '"></i><span>' + esc(r.name) + '</span>' +
+        '<b>' + pct.format(r.total / tot * 100) + '%<small>' + usd(r.total) + '</small></b></li>';
+    }).join('') + '</ul>';
+    pie.innerHTML = '<div class="pie-wrap">' + svg + leg + '</div>';
+
+    var max = Math.max.apply(null, c.res.map(function(r){ return r.total; })) || 1;
+    bars.innerHTML = c.res.map(function(r){
+      var paid = Math.max(0, Math.min(r.paidShare, r.total)), pend = Math.max(0, r.total - paid);
+      return '<div class="bar-row"><span class="bar-name">' + esc(r.name) + '</span>' +
+        '<div class="bar" title="' + esc(r.name) + ': pagado ' + usd(paid) + ', falta ' + usd(pend) + '">' +
+        '<span class="seg paid" style="width:' + (paid / max * 100) + '%"></span>' +
+        '<span class="seg pend" style="width:' + (pend / max * 100) + '%"></span></div>' +
+        '<span class="bar-val">' + usd(r.total) + '</span></div>';
+    }).join('') +
+    '<div class="bar-key"><span><i class="sw" style="background:var(--sea)"></i>Ya pagado de su parte</span>' +
+    '<span><i class="sw" style="background:var(--sun)"></i>Falta pagar</span></div>';
+  }
+
+  function viewId(){
+    var h = ''; try { h = decodeURIComponent((location.hash || '').slice(1)); } catch(e){}
+    return person(h) ? h : '';
+  }
+
+  function renderViews(){
+    var cur = viewId();
+    var h = '<a href="#" class="vtab' + (cur ? '' : ' on') + '"' + (cur ? '' : ' aria-current="page"') + '>General</a>';
+    S.people.forEach(function(p, k){
+      var on = cur === p.id;
+      h += '<a href="#' + encodeURIComponent(p.id) + '" class="vtab' + (on ? ' on' : '') + '"' + (on ? ' aria-current="page"' : '') + '>' +
+        '<i class="sw" style="background:' + colorOf(k) + '"></i>' + esc(p.name || 'Sin nombre') + '</a>';
+    });
+    document.getElementById('views').innerHTML = h;
+    document.body.setAttribute('data-view', cur ? 'person' : 'general');
+    return cur;
+  }
+
+  function joinNames(a){
+    a = a.map(esc);
+    return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+  }
+
+  function sum(list){ return list.reduce(function(a, x){ return a + x.amt; }, 0); }
+
+  function renderPerson(c, id){
+    var k = -1, r = null;
+    c.res.forEach(function(x, i){ if(x.id === id){ r = x; k = i; } });
+    if(!r) return;
+    var out = c.tr.filter(function(t){ return t.f === id; });
+    var inn = c.tr.filter(function(t){ return t.t === id; });
+    var net = r.pend + sum(out) - sum(inn);
+    var lbl, big, cls = '';
+    if(net > 0.005){ lbl = 'Te falta poner en total'; big = usd(net); }
+    else if(net < -0.005){ lbl = 'Te tienen que devolver'; big = usd(-net); cls = ' ok'; }
+    else { lbl = 'Estás al día'; big = usd(0); cls = ' ok'; }
+    var paidPart = Math.max(0, r.total - Math.max(0, r.pend));
+    var pctPaid = r.total > 0.005 ? paidPart / r.total * 100 : 0;
+
+    var h = '<div class="panel me-hero">' +
+      '<p class="me-name"><i class="sw" style="background:' + colorOf(k) + '"></i>' + esc(r.name) + ', ' + r.n + (r.n === 1 ? ' noche' : ' noches') + '</p>' +
+      '<p class="me-label">' + lbl + '</p>' +
+      '<p class="me-big' + cls + '">' + big + '</p>' +
+      (Math.abs(net) > 0.005 ? '<p class="me-sub">Son ' + ars(Math.abs(net) * c.rate) + ' al cambio de hoy.</p>' : '<p class="me-sub">No tenés nada para pagar ni para cobrar.</p>');
+    var eq = [], first = true;
+    function eqLine(sign, v, d){ eq.push('<li><span class="op">' + (first && sign === '+' ? '' : sign) + '</span><span class="v">' + usd(v) + '</span><span class="d">' + d + '</span></li>'); first = false; }
+    var pendExtras = r.items.some(function(it){ return !it.payer; });
+    if(out.length) eqLine('+', sum(out), 'para pasarle a ' + joinNames(out.map(function(t){ return t.to; })));
+    if(r.pend > 0.005) eqLine('+', r.pend, 'de tu parte de lo que falta pagar del alquiler' + (pendExtras ? ' y los extras' : ''));
+    if(inn.length) eqLine('−', sum(inn), (inn.length === 1 ? 'que te devuelve ' : 'que te devuelven ') + joinNames(inn.map(function(t){ return t.from; })));
+    if(eq.length) h += '<p class="me-eq-title">Sale de sumar:</p><ul class="me-eq">' + eq.join('') + '</ul>';
+    h += '</div>';
+
+    h += '<div class="me-grid"><div class="panel"><h3>Qué tenés que hacer</h3><ul class="lines">';
+    out.forEach(function(t){
+      h += '<li class="out"><span>Pasarle a ' + esc(t.to) + '</span><b>' + usd(t.amt) + '<small>' + ars(t.amt * c.rate) + '</small></b></li>';
+    });
+    if(r.pend > 0.005){
+      h += '<li class="out"><span>Tu parte de lo que falta pagar<small>Resto del alquiler y gastos que nadie pagó todavía</small></span><b>' + usd(r.pend) + '<small>' + ars(r.pend * c.rate) + '</small></b></li>';
+    }
+    inn.forEach(function(t){
+      h += '<li class="in"><span>Te pasa ' + esc(t.from) + '</span><b>+ ' + usd(t.amt) + '<small>' + ars(t.amt * c.rate) + '</small></b></li>';
+    });
+    if(!out.length && !inn.length && r.pend <= 0.005) h += '<li><span>No tenés nada pendiente.</span></li>';
+    h += '</ul></div>';
+
+    h += '<div class="panel"><h3>De dónde sale</h3><ul class="lines">' +
+      '<li><span>Alquiler<small>' + r.n + ' de ' + c.N + ' noches en total</small></span><b>' + usd(r.rent) + '</b></li>';
+    r.items.forEach(function(it){
+      h += '<li><span>' + esc(it.name) + '<small>Se reparte ' + it.how + (it.payer ? ', lo pagó ' + esc(it.payer) : ', sin pagar todavía') + '</small></span><b>' + usd(it.amt) + '</b></li>';
+    });
+    h += '<li class="strong"><span>Te toca en total</span><b>' + usd(r.total) + '<small>' + ars(r.total * c.rate) + '</small></b></li>' +
+      '<li><span>Pusiste de tu bolsillo</span><b>' + usd(r.pocket) + '</b></li>';
+    if(r.borrowed > 0.005) h += '<li><span>Pusieron por vos</span><b>' + usd(r.borrowed) + '</b></li>';
+    h += '</ul></div>';
+
+    var p = person(id), chips = '';
+    p.nights.forEach(function(on, i){
+      if(!on) return;
+      var d = dayDate(i);
+      chips += '<span>' + esc(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', '')) + ' ' + d.getDate() + '</span>';
+    });
+    h += '<div class="panel"><h3>Tus noches</h3><div class="night-chips">' + (chips || '<p class="note">Todavía no tenés noches marcadas.</p>') + '</div></div></div>';
+    document.getElementById('me').innerHTML = h;
+  }
+
+  function update(){
+    var c = compute();
+    var cur = renderViews();
+    if(cur) renderPerson(c, cur);
+    renderCharts(c);
+    var byId = {}; c.res.forEach(function(r){ byId[r.id] = r; });
+
+    S.people.forEach(function(p){
+      var cnt = document.querySelector('[data-cnt="' + p.id + '"]');
+      var amt = document.querySelector('[data-amt="' + p.id + '"]');
+      if(cnt) cnt.innerHTML = byId[p.id].n + ' <small>noches</small>';
+      if(amt) amt.textContent = usd(byId[p.id].rent);
+    });
+    for(var k=0;k<S.nights;k++){
+      var cell = document.querySelector('[data-col="' + k + '"]');
+      if(cell) cell.textContent = S.people.filter(function(p){ return p.nights[k]; }).length;
+    }
+
+    S.payments.forEach(function(p){
+      var el = document.querySelector('[data-eq="' + p.id + '"]');
+      if(el) el.textContent = p.cur === 'ARS' ? '= ' + usd(toUSD(p.amount, p.cur, p.rate)) : '';
+    });
+    S.extras.forEach(function(e){
+      var el = document.querySelector('[data-eq="' + e.id + '"]');
+      if(el) el.textContent = e.cur === 'ARS' ? '= ' + usd(toUSD(e.amount, e.cur, e.rate)) : '';
+    });
+
+    var pt = 'Pagado: <b>' + usd(c.P) + '</b> de ' + usd(c.R) + '. Falta pagar <b>' + usd(c.R - c.P) + '</b> (' + ars((c.R - c.P) * c.rate) + ' al cambio de hoy).';
+    if(c.P > c.R + 0.005) pt += ' <span class="warn">Los pagos superan el alquiler total. Revisá los montos.</span>';
+    document.getElementById('pay-totals').innerHTML = pt;
+
+    var t = '<thead><tr><th>Persona</th><th>Noches</th><th>Le toca en total</th><th>Ya puso</th><th>Saldo</th><th>Falta pagar</th></tr></thead><tbody>';
+    c.res.forEach(function(r, k){
+      var cls = r.bal > 0.005 ? 'pos' : (r.bal < -0.005 ? 'neg' : '');
+      var balTxt = r.bal > 0.005 ? 'Le deben' : (r.bal < -0.005 ? 'Debe' : 'A mano');
+      t += '<tr><td class="name"><i class="sw" style="background:' + colorOf(k) + '"></i>' + esc(r.name) + '</td><td>' + r.n + '</td>' +
+        '<td>' + usd(r.total) + '<small>' + ars(r.total * c.rate) + '</small></td>' +
+        '<td>' + usd(r.put) + (r.borrowed > 0.005 ? '<small>' + usd(r.borrowed) + ' prestado</small>' : '') + '</td>' +
+        '<td class="' + cls + '">' + usd(Math.abs(r.bal)) + '<small>' + balTxt + '</small></td>' +
+        '<td><b>' + usd(r.pend) + '</b><small>' + ars(r.pend * c.rate) + '</small></td></tr>';
+    });
+    t += '</tbody>';
+    document.getElementById('res').innerHTML = t;
+
+    var tl = document.getElementById('transfers');
+    if(!c.tr.length){
+      tl.innerHTML = '<li><span class="t-who">Están todos a mano con lo que se pagó hasta ahora.</span></li>';
+    } else {
+      tl.innerHTML = c.tr.map(function(x){
+        return '<li><span class="t-who"><b>' + esc(x.from) + '</b> le pasa a <b>' + esc(x.to) + '</b></span>' +
+          '<span class="t-amt">' + usd(x.amt) + '<small>' + ars(x.amt * c.rate) + '</small></span></li>';
+      }).join('');
+    }
+    if(c.extraWarn.length){
+      tl.innerHTML += '<li><span class="t-who warn">No se pudo repartir: ' + esc(c.extraWarn.join(', ')) + '. Elegí al menos una persona (y con noches, si se reparte por noches).</span></li>';
+    }
+
+    var a = dayDate(0), b = dayDate(S.nights);
+    var lines = [];
+    lines.push('Alquiler del ' + a.getDate() + '/' + (a.getMonth()+1) + ' al ' + b.getDate() + '/' + (b.getMonth()+1) + ': ' + usd(c.R) + ' (cotización ' + nf2.format(c.rate) + ')');
+    lines.push('');
+    lines.push('Lo que le toca a cada uno:');
+    c.res.forEach(function(r){ lines.push('- ' + r.name + ' (' + r.n + ' noches): ' + usd(r.total) + ' / ' + ars(r.total * c.rate)); });
+    lines.push('');
+    lines.push('Para quedar a mano con lo ya pagado:');
+    if(!c.tr.length) lines.push('- Todos a mano');
+    c.tr.forEach(function(x){ lines.push('- ' + x.from + ' le pasa a ' + x.to + ': ' + usd(x.amt) + ' / ' + ars(x.amt * c.rate)); });
+    lines.push('');
+    lines.push('Lo que falta pagar cada uno:');
+    c.res.forEach(function(r){ lines.push('- ' + r.name + ': ' + usd(r.pend) + ' / ' + ars(r.pend * c.rate)); });
+    document.getElementById('summary').value = lines.join('\n');
+
+    save();
+  }
+
+  function renderAll(){
+    normalize();
+    renderHeader(); renderGrid(); renderPayments(); renderExtras(); update();
+  }
+
+  /* ---------- Eventos ---------- */
+  function find(list, id){ for(var i=0;i<list.length;i++) if(list[i].id===id) return list[i]; return null; }
+
+  document.addEventListener('input', function(ev){
+    var el = ev.target, act = el.dataset.act; if(!act) return;
+    if(act === 'set'){
+      var k = el.dataset.k;
+      if(k === 'start'){ if(el.value) S.start = el.value; else return; }
+      else if(k === 'nights'){ if(!el.value) return; S.nights = num(el.value); normalize(); renderGrid(); renderHeaderText(); update(); return; }
+      else S[k] = num(el.value);
+      if(k === 'start'){ renderGrid(); renderHeaderText(); }
+      update(); return;
+    }
+    if(act === 'name'){ var p = person(el.dataset.id); if(p){ p.name = el.value; update(); } return; }
+    if(act === 'pay' || act === 'ext'){
+      var it = find(act === 'pay' ? S.payments : S.extras, el.dataset.id); if(!it) return;
+      var key = el.dataset.k;
+      if(el.tagName === 'SELECT') return; // lo maneja "change"
+      it[key] = (key === 'amount' || key === 'rate') ? num(el.value) : el.value;
+      update();
+    }
+  });
+
+  function renderHeaderText(){
+    var a = dayDate(0), b = dayDate(S.nights);
+    var o = {weekday:'long', day:'numeric', month:'long'};
+    document.getElementById('range').textContent =
+      'Llegada el ' + a.toLocaleDateString('es-AR', o).replace(',', '') + ', salida el ' + b.toLocaleDateString('es-AR', o).replace(',', '') +
+      '. ' + S.nights + ' noches en total.';
+  }
+
+  document.addEventListener('change', function(ev){
+    var el = ev.target, act = el.dataset.act; if(!act) return;
+    if(act === 'name'){ renderPayments(); renderExtras(); update(); return; }
+    if(act === 'set' && el.dataset.k === 'nights'){ el.value = S.nights; return; }
+    if((act === 'pay' || act === 'ext') && el.tagName === 'SELECT'){
+      var it = find(act === 'pay' ? S.payments : S.extras, el.dataset.id); if(!it) return;
+      it[el.dataset.k] = el.value;
+      if(el.dataset.k === 'cur' && el.value === 'ARS' && !num(it.rate)) it.rate = S.rateNow;
+      if(act === 'pay') renderPayments(); else renderExtras();
+      update();
+      var again = document.querySelector('[data-act="' + act + '"][data-id="' + it.id + '"][data-k="' + el.dataset.k + '"]');
+      if(again) again.focus();
+    }
+  });
+
+  var TUTO = [
+    {sel:'', t:'Bienvenido',
+     b:'<p>Esta calculadora reparte el alquiler según las noches que duerme cada uno, lleva la cuenta de lo que ya se pagó y te dice quién le tiene que pasar plata a quién.</p>' +
+       '<p>Te voy a ir señalando cada sección y explicando qué es cada dato. Todo está en dólares y abajo de cada número aparece en pesos.</p>'},
+    {sel:'#views', t:'Las pestañas',
+     b:'<p>Acá elegís la vista.</p>' +
+       '<ul><li><b>General:</b> todas las cuentas del grupo, donde se cargan noches, pagos y gastos.</li>' +
+       '<li><b>Tu nombre:</b> solo lo tuyo: cuánto te falta poner, a quién pasarle plata, quién te devuelve y de dónde sale tu parte.</li></ul>' +
+       '<p>Si al link le agregás <b>#</b> y tu nombre (por ejemplo <b>#valen</b>), se abre directo en tu vista.</p>'},
+    {sel:'#sec-noches', t:'Las noches de cada uno',
+     b:'<p>Cada fila es una persona y cada columna una noche. Tocá un cuadradito para marcar o desmarcar esa noche.</p>' +
+       '<p><span class="demo on"></span> duerme ahí &nbsp; <span class="demo"></span> no duerme</p>' +
+       '<ul><li><b>Noches:</b> cuántas noches se queda esa persona.</li>' +
+       '<li><b>Le toca:</b> su parte del alquiler, en dólares. Más noches, más paga.</li>' +
+       '<li><b>Duermen:</b> la última fila, cuántos hay cada noche.</li></ul>' +
+       '<p><b>Agregar persona</b> suma a alguien. <b>Quitar</b> pide tocar dos veces para no borrar sin querer.</p>'},
+    {sel:'#sec-casa', t:'La casa',
+     b:'<ul><li><b>Alquiler total:</b> lo que cuesta la casa entera, en dólares.</li>' +
+       '<li><b>Primera noche y cantidad de noches:</b> arman las columnas de la tabla de noches.</li>' +
+       '<li><b>Cotización de hoy:</b> pesos por dólar. Se usa para mostrar en pesos lo que falta pagar. Si cambia el dólar, actualizala acá.</li></ul>'},
+    {sel:'#sec-pagos', t:'Pagos del alquiler',
+     b:'<p>Cada vez que alguien le paga al dueño, se carga un pago.</p>' +
+       '<ul><li><b>Quién pagó:</b> el que puso la plata.</li>' +
+       '<li><b>A nombre de:</b> casi siempre “Él mismo”. Si puso plata por otro, elegí a ese otro: queda debiéndosela.</li>' +
+       '<li><b>Moneda y cotización:</b> si fue en pesos, la cotización a la que se pagó. A la derecha ves su equivalente en dólares.</li>' +
+       '<li><b>Línea de abajo:</b> cuánto se pagó del total y cuánto falta.</li></ul>'},
+    {sel:'#sec-extras', t:'Gastos extra',
+     b:'<p>Para limpieza, sábanas o lo que aparezca.</p>' +
+       '<ul><li><b>Lo pagó:</b> quién puso la plata. Si nadie todavía, “Nadie todavía”: se suma a lo que le falta pagar a cada uno.</li>' +
+       '<li><b>Se reparte:</b> “Igual entre ellos” divide en partes iguales; “Por noches” paga más el que se queda más.</li>' +
+       '<li><b>Entre:</b> tocá los nombres para elegir quiénes lo pagan.</li></ul>'},
+    {sel:'#charts', t:'Los gráficos',
+     b:'<ul><li><b>Torta:</b> qué porcentaje del total (alquiler + extras) pone cada uno, y cuántos dólares son.</li>' +
+       '<li><b>Barras:</b> la parte de cada uno. <b>Azul</b> es lo que ya está pagado de su parte y <b>amarillo</b> lo que falta.</li></ul>'},
+    {sel:'#res-panel', t:'La tabla de resultados',
+     b:'<ul><li><b>Le toca en total:</b> su parte del alquiler más los extras.</li>' +
+       '<li><b>Ya puso:</b> lo que sacó de su bolsillo hasta ahora (y lo que prestó por otro).</li>' +
+       '<li><b>Saldo:</b> la diferencia entre lo que puso y lo que le tocaba de lo ya pagado. Verde, le deben. Rojo, debe.</li>' +
+       '<li><b>Falta pagar:</b> su parte de lo que todavía no se le pagó al dueño, también en pesos al cambio de hoy.</li></ul>'},
+    {sel:'#transfers', t:'Para quedar a mano',
+     b:'<p>Son las transferencias entre ustedes para emparejar lo que ya se pagó: “X le pasa a Y”, con el monto en dólares y en pesos. Son las mínimas necesarias.</p>'},
+    {sel:'#summary', t:'Resumen para el grupo',
+     b:'<p>Un texto con lo que le toca a cada uno, las transferencias y lo que falta pagar. Con <b>Copiar resumen</b> lo mandás al grupo.</p>' +
+       '<p><b>Volver a los datos iniciales</b> descarta tus cambios.</p>'},
+    {sel:'', t:'Ojo con esto',
+     b:'<p>Lo que cambies queda guardado <b>solo en tu celu o tu compu</b>. Los demás no ven tus cambios.</p>' +
+       '<p>Cuando haya datos nuevos para todos (Santi confirma días, se paga el resto), Nico actualiza la página.</p>'}
+  ];
+  var tStep = 0, tourEl = null;
+
+  function placeTour(){
+    if(!tourEl) return;
+    var st = TUTO[tStep], hl = tourEl.hl, target = st.sel ? document.querySelector(st.sel) : null;
+    if(!target || target.getClientRects().length === 0){ hl.style.display = 'none'; return; }
+    var r = target.getBoundingClientRect(), pad = 6;
+    hl.style.display = 'block';
+    hl.style.left = (r.left - pad) + 'px'; hl.style.top = (r.top - pad) + 'px';
+    hl.style.width = (r.width + pad * 2) + 'px'; hl.style.height = (r.height + pad * 2) + 'px';
+  }
+
+  function showTuto(){
+    var st = TUTO[tStep], pop = tourEl.pop;
+    pop.querySelector('#tuto-step').textContent = 'Paso ' + (tStep + 1) + ' de ' + TUTO.length;
+    pop.querySelector('#tuto-dots').innerHTML = TUTO.map(function(_, i){ return '<i' + (i <= tStep ? ' class="on"' : '') + '></i>'; }).join('');
+    pop.querySelector('#tuto-title').textContent = st.t;
+    pop.querySelector('#tuto-body').innerHTML = st.b;
+    pop.scrollTop = 0;
+    pop.querySelector('[data-act="tuto-prev"]').disabled = tStep === 0;
+    pop.querySelector('[data-act="tuto-next"]').textContent = tStep === TUTO.length - 1 ? 'Listo' : 'Siguiente';
+    var target = st.sel ? document.querySelector(st.sel) : null;
+    pop.classList.toggle('center', !target);
+    if(target){
+      var r = target.getBoundingClientRect();
+      var top = r.top + window.pageYOffset - (st.sel === '#views' ? 20 : 70);
+      window.scrollTo(0, Math.max(0, top));
+    }
+    placeTour();
+  }
+
+  function openTuto(){
+    if(tourEl) return;
+    if(location.hash) location.hash = '';
+    var block = document.createElement('div'); block.id = 'tour-block';
+    var hl = document.createElement('div'); hl.id = 'tour-hl';
+    var pop = document.createElement('div'); pop.id = 'tour-pop';
+    pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-labelledby', 'tuto-title');
+    pop.innerHTML = '<p class="tuto-step" id="tuto-step"></p><div class="tuto-dots" id="tuto-dots" aria-hidden="true"></div>' +
+      '<h2 id="tuto-title"></h2><div id="tuto-body"></div>' +
+      '<div class="tuto-nav"><button class="del" data-act="tuto-close">Cerrar</button><span class="spacer"></span>' +
+      '<button class="btn ghost" data-act="tuto-prev">Anterior</button><button class="btn" data-act="tuto-next">Siguiente</button></div>';
+    document.body.appendChild(block); document.body.appendChild(hl); document.body.appendChild(pop);
+    tourEl = {block:block, hl:hl, pop:pop};
+    tStep = 0;
+    setTimeout(function(){ if(!tourEl) return; showTuto(); pop.querySelector('[data-act="tuto-next"]').focus(); }, 80);
+  }
+  function closeTuto(){
+    if(!tourEl) return;
+    tourEl.block.remove(); tourEl.hl.remove(); tourEl.pop.remove(); tourEl = null;
+  }
+  window.addEventListener('scroll', placeTour, {passive:true});
+  window.addEventListener('resize', placeTour);
+  document.addEventListener('keydown', function(ev){
+    if(!tourEl) return;
+    if(ev.key === 'Escape') closeTuto();
+    else if(ev.key === 'ArrowRight'){ if(tStep < TUTO.length - 1){ tStep++; showTuto(); } }
+    else if(ev.key === 'ArrowLeft'){ if(tStep > 0){ tStep--; showTuto(); } }
+  });
+
+  var armed = null;
+  function arm(btn, run){
+    if(armed === btn){ armed = null; run(); return; }
+    if(armed){ armed.classList.remove('armed'); armed.textContent = armed.dataset.label || 'Quitar'; }
+    btn.dataset.label = btn.textContent;
+    btn.textContent = '¿Seguro? Tocá de nuevo';
+    btn.classList.add('armed');
+    armed = btn;
+  }
+
+  document.addEventListener('click', function(ev){
+    var el = ev.target.closest('[data-act]'); if(!el) return;
+    var act = el.dataset.act;
+    if(act === 'tutorial'){
+      openTuto(); return;
+    }
+    if(act === 'tuto-next'){ if(tStep >= TUTO.length - 1) closeTuto(); else { tStep++; showTuto(); } return; }
+    if(act === 'tuto-prev'){ if(tStep > 0){ tStep--; showTuto(); } return; }
+    if(act === 'tuto-close'){ closeTuto(); return; }
+    if(act === 'night'){
+      var p = person(el.dataset.id); var i = +el.dataset.i; if(!p) return;
+      p.nights[i] = !p.nights[i];
+      el.classList.toggle('on', p.nights[i]);
+      el.setAttribute('aria-pressed', p.nights[i]);
+      update(); return;
+    }
+    if(act === 'addperson'){
+      var np = {id:uid(), name:'Nuevo', nights:fill(S.nights, 0, 0)};
+      S.people.push(np);
+      renderAll();
+      var inp = document.querySelector('[data-act="name"][data-id="' + np.id + '"]');
+      if(inp){ inp.focus(); inp.select(); }
+      return;
+    }
+    if(act === 'delperson'){
+      arm(el, function(){
+        var id = el.dataset.id;
+        S.people = S.people.filter(function(p){ return p.id !== id; });
+        S.payments = S.payments.filter(function(p){ return p.who !== id; });
+        S.payments.forEach(function(p){ if(p.para === id) p.para = ''; });
+        S.extras.forEach(function(e){ e.parts = (e.parts||[]).filter(function(x){ return x !== id; }); if(e.payer === id) e.payer = ''; });
+        renderAll();
+      });
+      return;
+    }
+    if(act === 'addpay'){
+      S.payments.push({id:uid(), who:(S.people[0]||{}).id || '', para:'', amount:0, cur:'ARS', rate:S.rateNow, note:''});
+      renderPayments(); update(); return;
+    }
+    if(act === 'delpay'){ S.payments = S.payments.filter(function(p){ return p.id !== el.dataset.id; }); renderPayments(); update(); return; }
+    if(act === 'addextra'){
+      S.extras.push({id:uid(), name:'', amount:0, cur:'ARS', rate:S.rateNow, payer:'', mode:'equal',
+        parts:S.people.filter(function(p){ return p.nights.some(Boolean); }).map(function(p){ return p.id; })});
+      renderExtras(); update();
+      var last = document.querySelectorAll('[data-act="ext"][data-k="name"]');
+      if(last.length) last[last.length-1].focus();
+      return;
+    }
+    if(act === 'delextra'){ S.extras = S.extras.filter(function(e){ return e.id !== el.dataset.id; }); renderExtras(); update(); return; }
+    if(act === 'part'){
+      var e = find(S.extras, el.dataset.id); if(!e) return;
+      e.parts = e.parts || [];
+      var pid = el.dataset.p, at = e.parts.indexOf(pid);
+      if(at >= 0) e.parts.splice(at,1); else e.parts.push(pid);
+      el.classList.toggle('on', at < 0);
+      el.setAttribute('aria-pressed', at < 0);
+      update(); return;
+    }
+    if(act === 'copy'){
+      var ta = document.getElementById('summary');
+      var done = function(){ el.textContent = 'Copiado'; setTimeout(function(){ el.textContent = 'Copiar resumen'; }, 1800); };
+      try {
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(ta.value).then(done, function(){ ta.focus(); ta.select(); el.textContent = 'Seleccionado, copialo a mano'; });
+        } else { ta.focus(); ta.select(); document.execCommand('copy'); done(); }
+      } catch(err){ ta.focus(); ta.select(); el.textContent = 'Seleccionado, copialo a mano'; }
+      return;
+    }
+    if(act === 'reset'){
+      arm(el, function(){ S = defaults(); renderAll(); el.textContent = 'Volver a los datos iniciales'; el.classList.remove('armed'); });
+      return;
+    }
+  });
+
+  window.addEventListener('hashchange', function(){ update(); window.scrollTo(0, 0); });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

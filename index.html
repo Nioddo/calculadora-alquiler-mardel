@@ -813,11 +813,28 @@ td.name .sw{margin-right:8px;vertical-align:-1px}
     {sel:'#summary', t:'Resumen para el grupo',
      b:'<p>Un texto con lo que le toca a cada uno, las transferencias y lo que falta pagar. Con <b>Copiar resumen</b> lo mandás al grupo.</p>' +
        '<p><b>Volver a los datos iniciales</b> descarta tus cambios.</p>'},
+    {v:1, sel:'#me .me-hero', t:'Tu pantalla: el número grande',
+     b:'<p>Ahora estás viendo la pestaña de <b>una persona</b> (de ejemplo, la primera). Cada uno ve la suya.</p>' +
+       '<ul><li><b>Número grande:</b> lo que te falta poner en total (en verde, lo que te tienen que devolver).</li>' +
+       '<li><b>Son $ … al cambio de hoy:</b> ese mismo monto en pesos.</li>' +
+       '<li><b>Sale de sumar:</b> el detalle de la cuenta: lo que le tenés que pasar a otros, tu parte de lo que falta pagar, menos lo que te devuelven.</li></ul>'},
+    {v:1, sel:'#me .me-grid > .panel:nth-child(1)', t:'Tu pantalla: qué tenés que hacer',
+     b:'<p>La lista de acciones concretas, con el monto en dólares y en pesos:</p>' +
+       '<ul><li><b>Pasarle a…:</b> transferencias que tenés que hacer (en rojo).</li>' +
+       '<li><b>Tu parte de lo que falta pagar:</b> lo que todavía no se le pagó al dueño.</li>' +
+       '<li><b>Te pasa…:</b> plata que te tienen que devolver (en verde).</li></ul>'},
+    {v:1, sel:'#me .me-grid > .panel:nth-child(2)', t:'Tu pantalla: de dónde sale',
+     b:'<ul><li><b>Alquiler:</b> tus noches sobre el total de noches del grupo.</li>' +
+       '<li><b>Gastos extra:</b> tu parte de cada uno, cómo se reparte y quién lo pagó.</li>' +
+       '<li><b>Te toca en total:</b> la suma de lo anterior.</li>' +
+       '<li><b>Pusiste de tu bolsillo:</b> lo que ya pagaste vos. <b>Pusieron por vos:</b> lo que otros pagaron a tu nombre.</li></ul>'},
+    {v:1, sel:'#me .me-grid > .panel:nth-child(3)', t:'Tu pantalla: tus noches',
+     b:'<p>Los días que te quedás, tal como los marcaron en la pestaña General.</p>'},
     {sel:'', t:'Ojo con esto',
      b:'<p>Lo que cambies queda guardado <b>solo en tu celu o tu compu</b>. Los demás no ven tus cambios.</p>' +
        '<p>Cuando haya datos nuevos para todos (Santi confirma días, se paga el resto), Nico actualiza la página.</p>'}
   ];
-  var tStep = 0, tourEl = null;
+  var tStep = 0, tourEl = null, tourEl0 = '';
 
   function placeTour(){
     if(!tourEl) return;
@@ -838,6 +855,18 @@ td.name .sw{margin-right:8px;vertical-align:-1px}
     pop.scrollTop = 0;
     pop.querySelector('[data-act="tuto-prev"]').disabled = tStep === 0;
     pop.querySelector('[data-act="tuto-next"]').textContent = tStep === TUTO.length - 1 ? 'Listo' : 'Siguiente';
+    var want = st.v && S.people[0] ? S.people[0].id : '';
+    if(viewId() !== want){
+      location.hash = want ? encodeURIComponent(want) : '';
+      pop.classList.add('center'); tourEl.hl.style.display = 'none';
+      var mine = tStep;
+      setTimeout(function(){ if(tourEl && tStep === mine) scrollTour(st); }, 150);
+      return;
+    }
+    scrollTour(st);
+  }
+  function scrollTour(st){
+    var pop = tourEl.pop;
     var target = st.sel ? document.querySelector(st.sel) : null;
     pop.classList.toggle('center', !target);
     if(target){
@@ -850,7 +879,7 @@ td.name .sw{margin-right:8px;vertical-align:-1px}
 
   function openTuto(){
     if(tourEl) return;
-    if(location.hash) location.hash = '';
+    tourEl0 = location.hash;
     var block = document.createElement('div'); block.id = 'tour-block';
     var hl = document.createElement('div'); hl.id = 'tour-hl';
     var pop = document.createElement('div'); pop.id = 'tour-pop';
@@ -867,6 +896,7 @@ td.name .sw{margin-right:8px;vertical-align:-1px}
   function closeTuto(){
     if(!tourEl) return;
     tourEl.block.remove(); tourEl.hl.remove(); tourEl.pop.remove(); tourEl = null;
+    if(location.hash !== tourEl0) location.hash = tourEl0;
   }
   window.addEventListener('scroll', placeTour, {passive:true});
   window.addEventListener('resize', placeTour);
